@@ -24,6 +24,7 @@
             borderRadius: '5px',
             border: '0',
             lang: 'zh-cn',
+            afterPreview: function() {},
         };
         this.options = $.extend({}, this.defaults, opt);
     };
@@ -46,7 +47,11 @@
                 border: this.options.border,
                 lang: this.options.lang,
             }); //设置CSS
-            _imgPreview(this.$element, this.$element.children('input'));
+            _imgPreview(
+              this.$element,
+              this.$element.children('input'),
+              this.options.afterPreview
+            );
             return this.$element;
         },
     };
@@ -104,13 +109,15 @@
      * @param  {Object} previewArea jQuery对象
      * @return {[type]}             [description]
      */
-    var _readURL = function(previewArea, input) {
+    var _readURL = function(previewArea, input, afterPreview) {
         if (input.files && input.files[0]) {
             var reader = new FileReader();
 
             reader.onload = function(e) {
                 // previewArea.attr('src', e.target.result);
                 previewArea.css('background-image', 'url(' + e.target.result + ')');
+
+                afterPreview(e.target.result);
             };
 
             reader.readAsDataURL(input.files[0]);
@@ -124,9 +131,9 @@
      * 图片上传前预览
      * @return {[type]} [description]
      */
-    var _imgPreview = function(previewArea, input) {
+    var _imgPreview = function(previewArea, input, afterPreview) {
         input.change(function() {
-            _readURL(previewArea, this);
+            _readURL(previewArea, this, afterPreview);
         });
     };
 
